@@ -29,9 +29,10 @@ if len(commands) > 65536:
     raise SystemExit("Encoded program exceeds the interpreter's 65,536-instruction limit")
 
 codes = dict(zip(">+.<-,[]", range(8)))
-lines = [
-    " ".join("gool" if codes[command] & (1 << bit) else "gaba" for bit in (2, 1, 0))
+words = [
+    "gool" if codes[command] & (1 << bit) else "gaba"
     for command in commands
+    for bit in (2, 1, 0)
 ]
-(root / "gaba.gool").write_text("\n".join(lines) + ("\n" if lines else ""), encoding="ascii")
-print(f"Encoded {len(art)} output bytes into {len(lines)} instructions using only gaba and gool")
+(root / "gaba.gool").write_text(",".join(words) + "\n", encoding="ascii")
+print(f"Encoded {len(art)} output bytes into {len(commands)} instructions using only gaba, gool, and commas")

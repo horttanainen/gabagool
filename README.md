@@ -1,7 +1,7 @@
 # Gaba Gool
 <img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/13fa4901-57f0-4aca-bdd4-4fad6eafa762" />
 
-A small language whose source contains only `gaba`, `gool`, and whitespace.
+A small language whose source contains only `gaba`, `gool`, and commas.
 `gaba.gool` prints a happy Tony Soprano ASCII portrait.
 
 To build from source on macOS or Linux with a C compiler:
@@ -11,19 +11,21 @@ cc -std=c11 -O2 -Wall -Wextra -Wpedantic -Werror gaba.c -o gaba
 ./gaba gaba.gool
 ```
 
-Every three words form one instruction. Newlines are just whitespace;
-`gaba.gool` puts one instruction on each line. Comments are not allowed.
+Words are separated by commas (`,`); a run of commas counts as one separator,
+and leading or trailing commas are ignored. A single newline at the very end of
+the file is allowed; any other whitespace is not, so `gaba.gool` is one long line. Every three words form one
+instruction. Comments are not allowed.
 
 | Words | Meaning |
 | --- | --- |
-| `gaba gaba gaba` | Move one memory cell right |
-| `gaba gaba gool` | Increase current cell by 1 |
-| `gaba gool gaba` | Print current cell as one byte (ASCII for this example) |
-| `gaba gool gool` | Move one memory cell left |
-| `gool gaba gaba` | Decrease current cell by 1 |
-| `gool gaba gool` | Read one byte into current cell (EOF sets it to zero) |
-| `gool gool gaba` | Start loop; skip to after its end when current cell is zero |
-| `gool gool gool` | End loop; repeat its body while current cell is nonzero |
+| `gaba,gaba,gaba` | Move one memory cell right |
+| `gaba,gaba,gool` | Increase current cell by 1 |
+| `gaba,gool,gaba` | Print current cell as one byte (ASCII for this example) |
+| `gaba,gool,gool` | Move one memory cell left |
+| `gool,gaba,gaba` | Decrease current cell by 1 |
+| `gool,gaba,gool` | Read one byte into current cell (EOF sets it to zero) |
+| `gool,gool,gaba` | Start loop; skip to after its end when current cell is zero |
+| `gool,gool,gool` | End loop; repeat its body while current cell is nonzero |
 
 This is a Brainfuck-style machine with 30,000 initially zero byte cells.
 The pointer starts at the first cell. Values wrap between 0 and 255;
