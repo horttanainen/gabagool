@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -29,31 +28,40 @@ static void fail(const char *format, ...)
     exit(EXIT_FAILURE);
 }
 
-/* Return one binary digit, or -1 at EOF. Words must be separated. */
-static int read_bit(FILE *source, size_t *line)
+/* Read one character; a single newline at the very end counts as EOF. */
+static int next_char(FILE *source)
+{
+    const int ch = fgetc(source);
+    if (ch != '\n') return ch;
+    const int after = fgetc(source);
+    if (after == EOF) return EOF;
+    ungetc(after, source);
+    return ch;
+}
+
+/* Return one binary digit, or -1 at EOF. Words must be separated by commas. */
+static int read_bit(FILE *source, size_t *word_number)
 {
     int ch;
-    while ((ch = fgetc(source)) != EOF && isspace((unsigned char)ch)) {
-        if (ch == '\n') ++*line;
+    while ((ch = next_char(source)) == ',') {
     }
     if (ch == EOF) return -1;
 
-    const size_t word_line = *line;
+    const size_t number = ++*word_number;
     char word[5];
     size_t length = 0;
     do {
         if (length == sizeof(word) - 1) {
-            fail("line %zu: expected a separate gaba or gool word", word_line);
+            fail("word %zu: expected a separate gaba or gool word", number);
         }
         word[length++] = (char)ch;
-        ch = fgetc(source);
-    } while (ch != EOF && !isspace((unsigned char)ch));
-    if (ch == '\n') ++*line;
+        ch = next_char(source);
+    } while (ch != EOF && ch != ',');
     word[length] = '\0';
 
     if (length == 4 && memcmp(word, "gaba", 4) == 0) return 0;
     if (length == 4 && memcmp(word, "gool", 4) == 0) return 1;
-    fail("line %zu: only gaba and gool are allowed", word_line);
+    fail("word %zu: only gaba and gool are allowed, separated by commas", number);
     return -1;
 }
 
@@ -65,10 +73,10 @@ static size_t load_program(const char *path)
         exit(EXIT_FAILURE);
     }
 
-    size_t line = 1, count = 0, depth = 0;
+    size_t word_number = 0, count = 0, depth = 0;
     unsigned int opcode = 0, words = 0;
     int bit;
-    while ((bit = read_bit(source, &line)) != -1) {
+    while ((bit = read_bit(source, &word_number)) != -1) {
         opcode = (opcode << 1) | (unsigned int)bit;
         if (++words < 3) continue;
         if (count == PROGRAM_LIMIT) fail("program exceeds %d instructions", PROGRAM_LIMIT);
