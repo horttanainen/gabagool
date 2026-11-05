@@ -1,4 +1,5 @@
 # Gaba Gool
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/13fa4901-57f0-4aca-bdd4-4fad6eafa762" />
 
 A small language whose source contains only `gaba`, `gool`, and whitespace.
 `gaba.gool` prints a happy Tony Soprano ASCII portrait.
